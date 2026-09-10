@@ -318,14 +318,15 @@
       const row = document.createElement('div');
       row.className = 'list-row';
       const members = Array.isArray(u.members) ? u.members : [];
-      const title = u.unassigned ? 'Unassigned' : ('Unit ' + (u.callsign || '-'));
+      // The callsign chip on the left already names the unit, so repeating it
+      // as "Unit 3-U-16" above the officer was saying the same thing twice.
+      // Officers sit directly beside the chip at one size.
       const membersHtml = members.length ? members.map(escapeHtml).join(', ') : 'No members';
       const count = members.length + (members.length === 1 ? ' officer' : ' officers');
       row.innerHTML =
         `<span class="callsign">${escapeHtml(u.unassigned ? '-' : (u.callsign || '-'))}</span>` +
         `<div class="list-main">` +
-          `<div class="list-top"><span class="list-title">${escapeHtml(title)}</span></div>` +
-          `<div class="list-meta">${membersHtml}</div>` +
+          `<span class="unit-officers${members.length ? '' : ' dim'}">${membersHtml}</span>` +
         `</div>` +
         `<span class="pill green"><span class="duty-dot"></span>${count}</span>`;
       frag.appendChild(row);
@@ -1501,9 +1502,17 @@
     el.className = 'pill ' + (st === 'clean' ? 'green' : 'danger');
   }
 
-  async function setWeaponStatus(status) {
+  // One button. Anything that is not 'missing' becomes missing; 'missing'
+  // becomes clean. A stolen weapon therefore flips to missing first, which is
+  // the honest reading: it is still not accounted for.
+  async function toggleWeaponMissing() {
     if (!wsCurrent) { toast('Search a serial first.', 'warn'); return; }
-    const res = await nui('setWeaponStatus', { serial: wsCurrent.serial, status });
+    const next = String(wsCurrent.status || 'clean').toLowerCase() === 'missing' ? 'clean' : 'missing';
+
+    setBusy('#ws-toggle-missing', true);
+    const res = await nui('setWeaponStatus', { serial: wsCurrent.serial, status: next });
+    setBusy('#ws-toggle-missing', false);
+
     if (res && res.success) {
       wsCurrent.status = res.status;
       renderWeaponStatus(res.status);
@@ -1644,8 +1653,7 @@
     $('#wl-name').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadWeaponList(); });
     $('#ws-search-btn').addEventListener('click', searchWeaponSerial);
     $('#ws-serial').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchWeaponSerial(); });
-    $('#ws-missing').addEventListener('click', () => setWeaponStatus('missing'));
-    $('#ws-clean').addEventListener('click', () => setWeaponStatus('clean'));
+    $('#ws-toggle-missing').addEventListener('click', toggleWeaponMissing);
     $('#ws-to-calc').addEventListener('click', () => {
       if (!wsCurrent) { toast('Search a serial first.', 'warn'); return; }
       targetAndOpenCalculator(wsCurrent.owner, 'serial');
