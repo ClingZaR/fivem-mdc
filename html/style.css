@@ -110,35 +110,28 @@ html, body{
 @keyframes pop{ from{ transform:scale(.99); opacity:0 } to{ transform:scale(1); opacity:1 } }
 
 /* ---------- Title bar ---------- */
-/* The seal is the identity, so it leads and the wordmark sits under it. The
-   bar is auto-height rather than a fixed 56px row, because a stacked brand
-   cannot fit in that, and the close button is pinned rather than being a
-   flex sibling,
-   so it stays top-right however tall the brand grows. */
+/* Seal top-left with the wordmark beside it, close button hard right. The bar
+   stays a single compact row: the seal is bigger than it was, but the header
+   is a title bar, not a banner. */
 .mdc-titlebar{
-  position:relative; flex:0 0 auto;
-  display:flex; align-items:center; justify-content:center;
-  padding:16px 18px 13px;
+  flex:0 0 68px; height:68px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 18px;
   border-bottom:1px solid var(--hairline);
 }
-.brand{
-  display:flex; flex-direction:column; align-items:center; gap:9px;
-  text-align:center; min-width:0;
-}
+.brand{ display:flex; flex-direction:row; align-items:center; gap:13px; min-width:0; }
 .brand-seal{
-  width:64px; height:64px; flex:0 0 auto;
+  width:48px; height:48px; flex:0 0 auto;
   object-fit:contain; border-radius:50%;
   background:#fff; padding:2px;
-  box-shadow:0 2px 10px rgba(0,0,0,.45);
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
 }
-.brand-text h1{ font-size:15px; font-weight:800; letter-spacing:2px; line-height:1.1; }
+.brand-text{ min-width:0; }
+.brand-text h1{ font-size:16px; font-weight:800; letter-spacing:1.6px; line-height:1.1; }
 .brand-text h1 span{ color:var(--accent); }
-.brand-text p{ font-size:9.5px; color:var(--text-muted); letter-spacing:2.2px; text-transform:uppercase; margin-top:4px; }
+.brand-text p{ font-size:9.5px; color:var(--text-muted); letter-spacing:2.2px; text-transform:uppercase; margin-top:3px; }
 
-.titlebar-right{
-  position:absolute; top:12px; right:14px;
-  display:flex; align-items:center; gap:10px;
-}
+.titlebar-right{ display:flex; align-items:center; gap:10px; }
 .icon-btn{
   width:32px; height:32px; border-radius:8px; margin-left:6px;
   display:grid; place-items:center; cursor:pointer;
