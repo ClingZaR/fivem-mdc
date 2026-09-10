@@ -1,0 +1,13 @@
+# Local editor / OS noise
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Never commit a server's own data or credentials
+*.local.lua
+config.local.lua
+*.sql.bak
+*.log

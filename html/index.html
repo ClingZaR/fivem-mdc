@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mobile Data Computer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<!-- Lucide (ISC) - vendored so the NUI never depends on a CDN.
+     https://lucide.dev  Add icons by dropping new <symbol> defs here. -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><defs>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" /> <circle cx="7" cy="17" r="2" /> <path d="M9 17h6" /> <circle cx="17" cy="17" r="2" /></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+  <symbol id="i-crosshair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <line x1="22" x2="18" y1="12" y2="12" /> <line x1="6" x2="2" y1="12" y2="12" /> <line x1="12" x2="12" y1="6" y2="2" /> <line x1="12" x2="12" y1="22" y2="18" /></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /> <circle cx="12" cy="12" r="3" /></symbol>
+  <symbol id="i-id-card" viewBox="0 0 24 24"><path d="M13 19a4 4 0 00-8 0" /> <path d="M16 10h2" /> <path d="M16 14h2" /> <circle cx="9" cy="12" r="3" /> <rect x="2" y="5" width="20" height="14" rx="2" /></symbol>
+  <symbol id="i-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18" /> <path d="m19 8 3 8a5 5 0 0 1-6 0zV7" /> <path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1" /> <path d="m5 8 3 8a5 5 0 0 1-6 0zV7" /> <path d="M7 21h10" /></symbol>
+  <symbol id="i-scan-barcode" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2" /> <path d="M17 3h2a2 2 0 0 1 2 2v2" /> <path d="M21 17v2a2 2 0 0 1-2 2h-2" /> <path d="M7 21H5a2 2 0 0 1-2-2v-2" /> <path d="M8 7v10" /> <path d="M12 7v10" /> <path d="M17 7v10" /></symbol>
+  <symbol id="i-scroll-text" viewBox="0 0 24 24"><path d="M15 12h-5" /> <path d="M15 8h-5" /> <path d="M19 17V5a2 2 0 0 0-2-2H4" /> <path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3" /></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34" /> <circle cx="11" cy="11" r="8" /></symbol>
+  <symbol id="i-siren" viewBox="0 0 24 24"><path d="M7 18v-6a5 5 0 1 1 10 0v6" /> <path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z" /> <path d="M21 12h1" /> <path d="M18.5 4.5 18 5" /> <path d="M2 12h1" /> <path d="M12 2v1" /> <path d="m4.929 4.929.707.707" /> <path d="M12 12v6" /></symbol>
+  <symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /> <path d="M12 9v4" /> <path d="M12 17h.01" /></symbol>
+  <symbol id="i-user-search" viewBox="0 0 24 24"><circle cx="10" cy="7" r="4" /> <path d="M10.3 15H7a4 4 0 0 0-4 4v2" /> <circle cx="17" cy="17" r="3" /> <path d="m21 21-1.9-1.9" /></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
+  <symbol id="i-fingerprint" viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" /> <path d="M14 13.12c0 2.38 0 6.38-1 8.88" /> <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" /> <path d="M2 12a10 10 0 0 1 18-6" /> <path d="M2 16h.01" /> <path d="M21.8 16c.2-2 .131-5.354 0-6" /> <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" /> <path d="M8.65 22c.21-.66.45-1.32.57-2" /> <path d="M9 6.8a6 6 0 0 1 9 5.2v2" /></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M12 17V7" /> <path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8" /> <path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z" /></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /> <path d="M7 11V7a5 5 0 0 1 10 0v4" /></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" /></symbol>
+  <symbol id="i-clipboard-check" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /> <path d="m9 14 2 2 4-4" /></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
+</defs></svg>
+
+  <!-- Booking-camera viewfinder (shown over gameplay during a mugshot capture) -->
+  <div id="booking-viewfinder" class="booking-vf hidden" aria-hidden="true">
+    <div class="vf-corner tl"></div><div class="vf-corner tr"></div>
+    <div class="vf-corner bl"></div><div class="vf-corner br"></div>
+    <div class="vf-reticle"></div>
+    <div class="vf-top">
+      <span class="vf-rec"><span class="vf-dot"></span>PHOTO</span>
+      <span id="vf-name" class="vf-name"></span>
+    </div>
+    <div class="vf-hint"><b>[E]</b> Capture &nbsp;&middot;&nbsp; <b>[Backspace]</b> Cancel</div>
+  </div>
+
+  <div id="app" class="hidden">
+    <!-- centered glass terminal; clicking the dim area around it closes -->
+    <div class="mdc-panel glass" role="dialog" aria-modal="true" aria-label="Mobile Data Terminal">
+
+      <!-- Title bar -->
+      <header class="mdc-titlebar">
+        <div class="brand">
+          <img class="brand-seal" src="logo.png" alt="" aria-hidden="true" />
+          <div class="brand-text">
+            <h1>MOBILE DATA <span>COMPUTER</span></h1>
+            <p>State of San Andreas</p>
+          </div>
+        </div>
+        <div class="titlebar-right">
+          <button id="close-btn" class="icon-btn" title="Close (Esc)" aria-label="Close">
+            <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-x"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="mdc-body">
+        <!-- Left tab rail -->
+        <nav class="mdc-rail" aria-label="Sections">
+          <button class="rail-btn active" data-tab="person" title="Record Search">
+            <svg class="ic" width="21" height="21" aria-hidden="true"><use href="#i-user-search"/></svg>
+            <span>Records</span>
+          </button>
+          <button class="rail-btn" data-tab="vehicle" title="Plate Search">
+            <svg class="ic" width="21" height="21" aria-hidden="true"><use href="#i-car"/></svg>
+            <span>Plates</span>
+          </button>
+          <button class="rail-btn" data-tab="citizenid" title="Citizen ID">
+            <svg class="ic" width="21" height="21" aria-hidden="true"><use href="#i-id-card"/></svg>
+            <span>Citizen</span>
+          </button>
+          <button class="rail-btn leo-only" data-tab="weaponlist" title="Weapon List">
+            <svg class="ic" width="21" height="21" aria-hidden="true"><use href="#i-crosshair"/></svg>
+            <span>Weapons</span>
+          </button>
+          <button class="rail-btn leo-only" data-tab="weaponsearch" title="Weapon Search">
+            <svg class="ic" width="21" height="21" aria-hidden="true"><use href="#i-scan-barcode"/></svg>
+            <span>Serial</span>
+          </button>
+          <button class="rail-btn" data-tab="bolos" title="BOLOs">
+            <svg class="ic" width="21" height="21" aria-hidden="true"><use href="#i-eye"/></svg>
+            <span>BOLOs</span>
+          </button>
+          <button class="rail-btn" data-tab="warrants" title="Warrants">
+            <svg class="ic" width="21" height="21" aria-hidden="true"><use href="#i-scroll-text"/></svg>
+            <span>Warrants</span>
+          </button>
+          <button class="rail-btn leo-only" data-tab="dashboard" title="Active Units">
+            <svg class="ic" width="21" height="21" aria-hidden="true"><use href="#i-users"/></svg>
+            <span>Units</span>
+          </button>
+          <div class="rail-spacer"></div>
+          <div class="rail-foot mono">v2.0</div>
+        </nav>
+
+        <!-- Content -->
+        <main class="mdc-content">
+
+          <!-- ============ TAB 1: DASHBOARD / ACTIVE UNITS ============ -->
+          <section class="tab-panel" data-tab="dashboard">
+            <div class="panel-head row">
+              <div>
+                <h2>Active Units</h2>
+                <p class="panel-sub">Officers currently on duty.</p>
+              </div>
+              <button id="dash-refresh" class="btn">
+                <svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-refresh-cw"/></svg>
+                Refresh
+              </button>
+            </div>
+            <div class="panel-body">
+              <div id="dash-list" class="list-stack"></div>
+            </div>
+          </section>
+
+          <!-- ============ TAB 2: PERSON SEARCH ============ -->
+          <section class="tab-panel active" data-tab="person">
+            <div class="panel-head">
+              <h2>Person Search</h2>
+              <p class="panel-sub">Look up a citizen record by name.</p>
+            </div>
+
+            <div class="searchbar">
+              <div class="input-wrap">
+                <svg class="ic input-ic" width="18" height="18" aria-hidden="true"><use href="#i-search"/></svg>
+                <input id="person-name" type="text" placeholder="First and / or last name" autocomplete="off" spellcheck="false" />
+              </div>
+              <button id="per-search-btn" class="btn-primary">Search</button>
+            </div>
+
+            <div class="panel-body" id="per-body">
+              <div id="per-empty" class="empty-state">
+                <svg class="ic empty-ic" width="40" height="40" aria-hidden="true"><use href="#i-search"/></svg>
+                <p class="empty-title">Search a name to begin</p>
+                <p class="empty-sub">Records are looked up by name only.</p>
+              </div>
+
+              <div id="per-results" class="results hidden">
+                <div class="person-top">
+                  <div class="mugshot-box">
+                    <img id="per-mug" class="mugshot-img hidden" alt="Mugshot" />
+                    <div id="per-mug-ph" class="mugshot-ph">
+                      <svg class="ic" width="46" height="46" aria-hidden="true"><use href="#i-user"/></svg>
+                      <span>No photo on record</span>
+                    </div>
+                  </div>
+
+                  <div class="person-info">
+                    <div class="card record-card">
+                      <div class="card-head">
+                        <h3>Citizen Record</h3>
+                        <button id="per-to-calc" class="btn-primary small leo-only" title="Open the arrest calculator for this person">
+                          <svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-scale"/></svg>
+                          Arrest Calculator
+                        </button>
+                      </div>
+                      <div class="record-grid cols-3">
+                        <div class="field"><label><svg class="ic fld-ic" width="13" height="13" aria-hidden="true"><use href="#i-id-card"/></svg>Name</label><span id="per-name">-</span></div>
+                        <div class="field"><label><svg class="ic fld-ic" width="13" height="13" aria-hidden="true"><use href="#i-phone"/></svg>Phone</label><span id="per-phone" class="mono">-</span></div>
+                        <div class="field"><label><svg class="ic fld-ic" width="13" height="13" aria-hidden="true"><use href="#i-fingerprint"/></svg>Fingerprints</label><span id="per-prints">-</span></div>
+                      </div>
+                    </div>
+
+                    <div class="totals-row">
+                      <div class="stat-card"><span class="stat-num tnum" id="per-total-charges">0</span><span class="stat-label"><svg class="ic stat-ic" width="12" height="12" aria-hidden="true"><use href="#i-scale"/></svg>Charges</span></div>
+                      <div class="stat-card"><span class="stat-num tnum" id="per-total-citations">0</span><span class="stat-label"><svg class="ic stat-ic" width="12" height="12" aria-hidden="true"><use href="#i-receipt"/></svg>Citations</span></div>
+                      <div class="stat-card"><span class="stat-num tnum" id="per-total-imprisonments">0</span><span class="stat-label"><svg class="ic stat-ic" width="12" height="12" aria-hidden="true"><use href="#i-lock"/></svg>Imprisonments</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card record-merged">
+                  <div class="card-head">
+                    <h3>Criminal Record</h3>
+                    <div class="head-actions">
+                      <button id="per-history-toggle" class="btn-ghost small" aria-expanded="false"
+                              aria-controls="per-history-wrap">
+                        <svg class="ic chev" width="14" height="14" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+                        <span id="per-history-toggle-label">Show history</span>
+                        <span class="count-pill tnum" id="per-history-count">0</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Outstanding charges: ALWAYS visible, even when there are none. -->
+                  <div class="record-sub">
+                    <div class="record-sub-head">
+                      <h4>Outstanding Charges</h4>
+                      <span class="count-pill tnum" id="per-out-count">0</span>
+                    </div>
+                    <table class="rec-table">
+                      <thead><tr><th>Code</th><th>Charge</th><th>Class</th><th class="num">Jail</th><th class="num">Fine</th><th>Modifiers</th></tr></thead>
+                      <tbody id="per-outstanding-body"></tbody>
+                    </table>
+                  </div>
+
+                  <!-- Prior record: collapsed by default; revealed by the toggle above. -->
+                  <div class="record-sub hidden" id="per-history-wrap">
+                    <div class="record-sub-head">
+                      <h4>Record History</h4>
+                      <div class="hist-filter" id="per-history-filters">
+                        <span class="hist-filter-label">Show</span>
+                        <button type="button" class="filter-chip felony"      data-filter="felony"      aria-pressed="true">Felonies</button>
+                        <button type="button" class="filter-chip misdemeanor" data-filter="misdemeanor" aria-pressed="true">Misdemeanors</button>
+                        <button type="button" class="filter-chip citation"    data-filter="citation"    aria-pressed="true">Citations</button>
+                      </div>
+                    </div>
+                    <table class="rec-table">
+                      <thead><tr><th>Code</th><th>Title</th><th>Class</th><th>Plea</th></tr></thead>
+                      <tbody id="per-history-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ TAB 3: VEHICLE SEARCH ============ -->
+          <section class="tab-panel" data-tab="vehicle">
+            <div class="panel-head">
+              <h2>Vehicle Search</h2>
+              <p class="panel-sub">Query the registry by license plate.</p>
+            </div>
+
+            <div class="searchbar">
+              <div class="input-wrap">
+                <svg class="ic input-ic" width="18" height="18" aria-hidden="true"><use href="#i-search"/></svg>
+                <input id="vehicle-plate" type="text" maxlength="12" placeholder="Enter plate (e.g. 12ABC345)" autocomplete="off" spellcheck="false" />
+              </div>
+              <button id="veh-search-btn" class="btn-primary">Search</button>
+            </div>
+
+            <div class="panel-body" id="veh-body">
+              <div id="veh-empty" class="empty-state">
+                <svg class="ic empty-ic" width="40" height="40" aria-hidden="true"><use href="#i-car"/></svg>
+                <p class="empty-title">Search a plate to begin</p>
+                <p class="empty-sub">Returns the registered owner and registration details.</p>
+              </div>
+
+              <div id="veh-results" class="results hidden">
+                <div class="card">
+                  <table class="rec-table kv-table">
+                    <tbody>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-user"/></svg>Owner</td><td id="veh-owner">-</td></tr>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-car"/></svg>Vehicle</td><td id="veh-model">-</td></tr>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-id-card"/></svg>License Plate</td><td id="veh-plate" class="mono">-</td></tr>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-id-card"/></svg>Plate Version</td><td id="veh-plate-ver" class="mono tnum">0</td></tr>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-scroll-text"/></svg>Latest Plate Record</td><td id="veh-plate-rec" class="mono">-</td></tr>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-scan-barcode"/></svg>VIN</td><td id="veh-vin" class="mono">-</td></tr>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-phone"/></svg>Phone Number</td><td id="veh-phone" class="mono">-</td></tr>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-triangle-alert"/></svg>Total Charges</td><td id="veh-tot-charges" class="tnum">0</td></tr>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-receipt"/></svg>Total Citations</td><td id="veh-tot-citations" class="tnum">0</td></tr>
+                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-lock"/></svg>Total Imprisonments</td><td id="veh-tot-imprisonments" class="tnum">0</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="ws-actions">
+                    <button id="veh-print" class="btn">Print Info</button>
+                    <button id="veh-to-calc" class="btn-primary small leo-only">Arrest Calculator</button>
+                    <button id="veh-bolo" class="btn">Copy BOLO Text</button>
+                  </div>
+                </div>
+
+                <!-- Owner's record. Outstanding is a toggle like the class filters
+                     so an officer can flip between "wanted now" and full history. -->
+                <div class="card record-merged">
+                  <div class="card-head">
+                    <h3>Owner Record</h3>
+                    <span class="count-pill tnum" id="veh-rec-count">0</span>
+                  </div>
+                  <div class="record-sub-head">
+                    <div class="hist-filter" id="veh-filters">
+                      <button type="button" class="filter-chip outstanding" data-filter="outstanding" aria-pressed="true">Outstanding charges</button>
+                      <button type="button" class="filter-chip felony"      data-filter="felony"      aria-pressed="true">Felonies</button>
+                      <button type="button" class="filter-chip misdemeanor" data-filter="misdemeanor" aria-pressed="true">Misdemeanors</button>
+                      <button type="button" class="filter-chip citation"    data-filter="citation"    aria-pressed="true">Citations</button>
+                    </div>
+                  </div>
+                  <table class="rec-table">
+                    <thead><tr><th>Date</th><th>Charge</th><th>Officer</th><th>Plea</th></tr></thead>
+                    <tbody id="veh-rec-body"></tbody>
+                  </table>
+                </div>
+
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ TAB 4: ARREST CALCULATOR ============ -->
+          <section class="tab-panel" data-tab="calculator">
+            <div class="panel-head">
+              <h2>Arrest Calculator</h2>
+            </div>
+
+            <div class="calc-grid">
+              <!-- Available -->
+              <div class="card calc-col">
+                <div class="card-head">
+                  <h3>Available Charges</h3>
+                  <span class="count-pill tnum" id="available-count">0</span>
+                </div>
+                <div class="calc-filter">
+                  <div class="input-wrap">
+                    <svg class="ic input-ic" width="16" height="16" aria-hidden="true"><use href="#i-search"/></svg>
+                    <input id="charge-search" type="text" placeholder="Filter penal code (code, title, keyword)" autocomplete="off" spellcheck="false" />
+                  </div>
+                </div>
+                <div id="available-list" class="scroll-list">
+                  <div class="empty pad">Loading penal code&hellip;</div>
+                </div>
+              </div>
+
+              <!-- Cart -->
+              <div class="card calc-col">
+                <div class="card-head">
+                  <h3>Charges to Place</h3>
+                  <button id="cart-clear" class="btn-ghost small">Clear all</button>
+                </div>
+                <div id="cart-list" class="scroll-list"></div>
+              </div>
+
+              <!-- Summary -->
+              <div class="card calc-col summary-col">
+                <div class="card-head"><h3>Summary</h3></div>
+
+                <div class="summary-stats">
+                  <div class="summary-stat">
+                    <span class="summary-label">Total Jail Time</span>
+                    <span class="summary-val tnum"><b id="summary-jail">0</b> min</span>
+                  </div>
+                  <div class="summary-stat">
+                    <span class="summary-label">Total Fine</span>
+                    <span class="summary-val accent tnum" id="summary-fine">$0</span>
+                  </div>
+                  <div class="summary-stat small-row">
+                    <span class="summary-label">Charges</span>
+                    <span class="summary-val tnum" id="summary-count">0</span>
+                  </div>
+                </div>
+
+                <!-- One incident, many suspects: the same charge set is applied
+                     to every target in this list. -->
+                <div class="target-block">
+                  <div class="target-head">
+                    <span class="target-label">Targets</span>
+                    <span class="count-pill tnum" id="target-count">0</span>
+                  </div>
+                  <div class="target-add">
+                    <input id="target-input" type="text" placeholder="Add a name" autocomplete="off" spellcheck="false" />
+                    <button type="button" id="target-add-btn" class="btn-ghost small">Add</button>
+                  </div>
+                  <div id="target-list" class="target-list"></div>
+                </div>
+
+                <div class="action-buttons">
+                  <button id="btn-place" class="btn-primary block" disabled>
+                    <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-clipboard-check"/></svg>
+                    <span id="btn-place-label">Place Charges</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ TAB 5: BOLOs ============ -->
+          <section class="tab-panel" data-tab="bolos">
+            <div class="panel-head row">
+              <div>
+                <h2>BOLOs</h2>
+                <p class="panel-sub">Active be-on-the-lookout alerts.</p>
+              </div>
+              <div class="head-actions leo-only">
+                <button id="bolo-refresh" class="btn icon-only" title="Refresh">
+                  <svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-refresh-cw"/></svg>
+                </button>
+                <button id="bolo-new-btn" class="btn primary">
+                  <svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-siren"/></svg>
+                  New BOLO
+                </button>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <form id="bolo-form" class="card create-form hidden leo-only">
+                <div class="form-row">
+                  <label class="shrink">Type
+                    <select id="bolo-type">
+                      <option value="person">Person</option>
+                      <option value="vehicle">Vehicle</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </label>
+                  <label class="grow">Title
+                    <input id="bolo-title" type="text" placeholder="Subject / plate / short label" autocomplete="off" />
+                  </label>
+                  <label class="shrink">Expires
+                    <select id="bolo-expiry"></select>
+                  </label>
+                </div>
+                <div class="link-field">
+                  <span class="link-cap">Image links (optional)</span>
+                  <div id="bolo-images" class="link-rows"></div>
+                  <button type="button" id="bolo-add-link" class="btn-ghost small link-add">
+                    <svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-plus"/></svg>
+                    Add link
+                  </button>
+                </div>
+                <label>Description
+                  <textarea id="bolo-desc" rows="3" placeholder="Details, last known location, danger notes&hellip;"></textarea>
+                </label>
+                <div class="form-actions">
+                  <button type="button" id="bolo-cancel" class="btn">Cancel</button>
+                  <button type="submit" id="bolo-create" class="btn primary">Create</button>
+                </div>
+              </form>
+
+              <div id="bolo-list" class="bolo-grid"></div>
+            </div>
+          </section>
+
+          <!-- ============ TAB 6: WARRANTS ============ -->
+          <section class="tab-panel" data-tab="warrants">
+            <div class="panel-head row">
+              <div>
+                <h2>Warrants</h2>
+                <p class="panel-sub">Suspects with outstanding charges.</p>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div id="warrant-list" class="list-stack"></div>
+            </div>
+          </section>
+
+          <!-- ============ CITIZEN ID ============ -->
+          <section class="tab-panel" data-tab="citizenid">
+            <div class="panel-head">
+              <h2>Citizen ID Lookup</h2>
+              <p class="panel-sub">Driver licence and licences on record. Search by name.</p>
+            </div>
+            <div class="searchbar">
+              <div class="input-wrap">
+                <svg class="ic input-ic" width="18" height="18" aria-hidden="true"><use href="#i-search"/></svg>
+                <input id="cid-query" type="text" placeholder="Name (e.g. John Doe or John_Doe)" autocomplete="off" spellcheck="false" />
+              </div>
+              <button id="cid-search-btn" class="btn-primary">Search</button>
+            </div>
+            <div class="panel-body">
+              <div id="cid-empty" class="empty-state">
+                <svg class="ic empty-ic" width="40" height="40" aria-hidden="true"><use href="#i-id-card"/></svg>
+                <p class="empty-title">Search a citizen</p>
+                <p class="empty-sub">Returns the licence record held by the DMV.</p>
+              </div>
+              <div id="cid-results" class="results hidden">
+                <div class="dl-card">
+                  <div class="dl-head">
+                    <span class="dl-state">STATE OF SAN ANDREAS</span>
+                    <span class="dl-class">CLASS <b id="cid-class">C</b></span>
+                  </div>
+                  <div class="dl-title">DRIVER LICENCE</div>
+                  <div class="dl-body">
+                    <div class="dl-photo">
+                      <img id="cid-mug" class="mugshot-img hidden" alt="Licence photo" />
+                      <div id="cid-mug-ph" class="mugshot-ph"><svg class="ic" width="34" height="34" aria-hidden="true"><use href="#i-id-card"/></svg><span>No DMV photo</span></div>
+                    </div>
+                    <div class="dl-fields">
+                      <div class="dl-f name"><label>Name</label>
+                        <span class="dl-v"><span id="cid-name">-</span><span id="cid-online" class="pill green hidden">ONLINE</span></span>
+                      </div>
+                      <div class="dl-f"><label>DL</label><span class="dl-v mono nowrap" id="cid-dl">-</span></div>
+                      <div class="dl-f"><label>DOB</label><span class="dl-v mono" id="cid-dob">-</span></div>
+                      <div class="dl-f"><label>Sex</label><span class="dl-v" id="cid-sex">-</span></div>
+                      <div class="dl-f"><label>Phone</label><span class="dl-v mono" id="cid-phone">-</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-head"><h3>Licences on record</h3><span class="count-pill tnum" id="cid-lic-count">0</span></div>
+                  <table class="rec-table">
+                    <thead><tr><th>Type</th><th>Status</th><th>Issued</th><th>Expires</th><th>Issuer</th></tr></thead>
+                    <tbody id="cid-lic-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ WEAPON LIST ============ -->
+          <section class="tab-panel leo-only" data-tab="weaponlist">
+            <div class="panel-head">
+              <h2>Registered Weapons</h2>
+              <p class="panel-sub">Search registered firearms by owner name. Blank shows the newest registrations.</p>
+            </div>
+            <div class="searchbar">
+              <div class="input-wrap">
+                <svg class="ic input-ic" width="18" height="18" aria-hidden="true"><use href="#i-search"/></svg>
+                <input id="wl-name" type="text" placeholder="Owner name" autocomplete="off" spellcheck="false" />
+              </div>
+              <button id="wl-search-btn" class="btn-primary">Search</button>
+            </div>
+            <div class="panel-body">
+              <div class="card">
+                <div class="card-head"><h3>Results</h3><span class="count-pill tnum" id="wl-count">0</span></div>
+                <table class="rec-table">
+                  <thead><tr><th>Date</th><th>Serial</th><th>Owner</th><th>Source</th><th>Weapon</th><th>Status</th></tr></thead>
+                  <tbody id="wl-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ WEAPON SEARCH (by serial) ============ -->
+          <section class="tab-panel leo-only" data-tab="weaponsearch">
+            <div class="panel-head">
+              <h2>Weapon Search</h2>
+              <p class="panel-sub">Look up a registration by serial number.</p>
+            </div>
+            <div class="searchbar">
+              <div class="input-wrap">
+                <svg class="ic input-ic" width="18" height="18" aria-hidden="true"><use href="#i-search"/></svg>
+                <input id="ws-serial" type="text" placeholder="Serial number" autocomplete="off" spellcheck="false" />
+              </div>
+              <button id="ws-search-btn" class="btn-primary">Search</button>
+            </div>
+            <div class="panel-body">
+              <div id="ws-empty" class="empty-state">
+                <svg class="ic empty-ic" width="40" height="40" aria-hidden="true"><use href="#i-scan-barcode"/></svg>
+                <p class="empty-title">Search a serial</p>
+                <p class="empty-sub">Serials are stamped on every registered firearm.</p>
+              </div>
+              <div id="ws-results" class="results hidden">
+                <div class="card">
+                  <div class="card-head"><h3>Registration</h3><span class="pill" id="ws-status">-</span></div>
+                  <div class="record-grid cols-2">
+                    <div class="field"><label>Owner</label><span id="ws-owner">-</span></div>
+                    <div class="field"><label>Weapon</label><span id="ws-weapon" class="mono">-</span></div>
+                    <div class="field"><label>Serial</label><span id="ws-serial-out" class="mono">-</span></div>
+                    <div class="field"><label>Licence</label><span id="ws-dl" class="mono">-</span></div>
+                    <div class="field"><label>Source</label><span id="ws-source">-</span></div>
+                    <div class="field"><label>Registered</label><span id="ws-date" class="mono">-</span></div>
+                  </div>
+                  <div class="ws-actions">
+                    <button id="ws-missing" class="btn">Flag missing</button>
+                    <button id="ws-clean" class="btn">Mark clean</button>
+                    <button id="ws-to-calc" class="btn-primary small">Arrest Calculator</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </main>
+      </div>
+    </div>
+
+
+    <!-- Fullscreen BOLO image lightbox: object-fit contain on a dark scrim;
+         prev/next step within a single BOLO's images, X or Esc closes. -->
+    <div id="lightbox" class="lightbox hidden" role="dialog" aria-modal="true" aria-label="BOLO image">
+      <button id="lb-close" class="lb-close" title="Close (Esc)" aria-label="Close">
+        <svg class="ic" width="22" height="22" aria-hidden="true"><use href="#i-x"/></svg>
+      </button>
+      <button id="lb-prev" class="lb-nav lb-prev" title="Previous (Left)" aria-label="Previous">
+        <svg class="ic" width="30" height="30" aria-hidden="true"><use href="#i-chevron-left"/></svg>
+      </button>
+      <img id="lb-img" class="lb-img" alt="BOLO image" />
+      <button id="lb-next" class="lb-nav lb-next" title="Next (Right)" aria-label="Next">
+        <svg class="ic" width="30" height="30" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+      </button>
+      <div id="lb-index" class="lb-index tnum">1 / 1</div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
