@@ -986,16 +986,8 @@ input, textarea, select{ user-select:text; -webkit-user-select:text; }
 .tab-panel.section-off{ display:none !important; }
 
 /* ============================================================
-   PLATE SEARCH - key/value registration table + owner record
+   PLATE SEARCH - owner record under the registration
    ============================================================ */
-.kv-table td{ padding:10px 16px; border-bottom:1px solid var(--hairline); }
-.kv-table tr:last-child td{ border-bottom:none; }
-.kv-table .kv-k{
-  width:210px; color:var(--text-muted); font-size:12px; font-weight:600;
-  display:flex; align-items:center; gap:8px; white-space:nowrap;
-}
-.kv-table .kv-k .ic{ color:var(--deco); flex:0 0 auto; }
-.kv-table td:not(.kv-k){ color:var(--text); font-size:13.5px; }
 
 /* An outstanding charge is live, so it is tinted apart from served history. */
 .rec-table tr.row-outstanding td{ background:rgba(217,119,6,.07); }

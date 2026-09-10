@@ -105,6 +105,32 @@ they can never disagree with a citizen's record.
 | --- | --- |
 | ![Warrants](docs/warrants.png) | ![Active units](docs/units.png) |
 
+## BOLO text
+
+"Copy BOLO Text" on a plate lookup builds a line from a template in
+`config.lua`, so the wording matches how your department writes them:
+
+```lua
+Config.BoloText = {
+    template = '{time} {date} | {detail} {model} | LP: {plate} | RO: {owner} | {extra}',
+    detail = 'DETAIL_HERE',
+    extra  = 'EXTRA_INFO',
+}
+```
+
+Produces:
+
+```
+18:42 PM 10/SEP | DETAIL_HERE Coquette D5 | LP: H0PE | RO: Jimmi Jones | EXTRA_INFO
+```
+
+Tokens: `{time}` `{date}` `{detail}` `{model}` `{plate}` `{owner}` `{vin}`
+`{phone}` `{charges}` `{extra}`. Unknown tokens are left alone rather than
+blanked, so a typo is visible instead of silently eating text.
+
+"Print Info" puts the record in chat rather than on the clipboard, so the
+channel sees it.
+
 ## Dismissing a charge
 
 Supervisors and the justice system can clear an outstanding charge from a

@@ -59,6 +59,20 @@ Config.Dmv = {
     allowLeo = true,    -- on-duty police may also take one (small servers)
 }
 
+-- "Copy BOLO Text" on a plate lookup. Edit the template to match how your
+-- department words a BOLO; the tokens are substituted at copy time.
+--
+--   {time}    18:42 PM        {plate}    H0PE
+--   {date}    10/SEP          {owner}    Jimmi Jones
+--   {detail}  see below       {vin}      ZWAG3ZJAJHWPUA000
+--   {model}   Coquette D5     {phone}    5183727
+--   {extra}   see below       {charges}  count of outstanding charges
+Config.BoloText = {
+    template = '{time} {date} | {detail} {model} | LP: {plate} | RO: {owner} | {extra}',
+    detail = 'DETAIL_HERE',   -- placeholder the officer overwrites after pasting
+    extra  = 'EXTRA_INFO',
+}
+
 -- Dismissing an outstanding charge.
 --
 -- A dismissal does NOT delete anything. The charge stops being outstanding (so

@@ -156,7 +156,8 @@
   // ------------------------------------------------------------------
   // Open / close
   // ------------------------------------------------------------------
-  function openMdc(plate, role, boloExpiry, sections) {
+  function openMdc(plate, role, boloExpiry, sections, boloText) {
+    if (boloText) boloTextCfg = boloText;
     buildExpirySelect(boloExpiry);
     applySections(sections);
     const newRole = (role === 'court') ? 'court' : 'leo';
@@ -193,7 +194,7 @@
 
   window.addEventListener('message', (e) => {
     const d = e.data || {};
-    if (d.action === 'open') openMdc(d.plate, d.role, d.boloExpiry, d.sections);
+    if (d.action === 'open') openMdc(d.plate, d.role, d.boloExpiry, d.sections, d.boloText);
     else if (d.action === 'close') hideMdc();
     else if (d.action === 'downscaleMugshot') {   // raw booking photo -> resize -> return small
       downscaleMugshot(d.src);
@@ -393,7 +394,8 @@
     $('#veh-owner').textContent = data.owner || '-';
     $('#veh-model').textContent = vehicleLabel(data.model);
     $('#veh-plate').textContent = data.plate || '-';
-    $('#veh-plate-ver').textContent = String(Number(data.plateVersion) || 0);
+    // Plate provenance folded into one field: current plate and how many
+    // plates this VIN has carried. 0 means it has never been re-plated.
     $('#veh-plate-rec').textContent = `${data.plate || '-'} (${records})`;
     $('#veh-vin').textContent = data.vin || '-';
     $('#veh-phone').textContent = data.phone || '-';
@@ -505,31 +507,50 @@
     ok ? done() : toast('Could not copy to clipboard.', 'err');
   }
 
-  function vehicleInfoText() {
-    if (!vehCurrent) return '';
+  // Print Info goes to CHAT, so the whole channel sees the record rather than it
+  // landing silently on one officer's clipboard.
+  function vehicleInfoLines() {
+    if (!vehCurrent) return [];
     const d = vehCurrent, t = d.totals || {};
     return [
-      'VEHICLE REGISTRATION',
-      'Owner:               ' + (d.owner || '-'),
-      'Vehicle:             ' + vehicleLabel(d.model),
-      'License Plate:       ' + (d.plate || '-'),
-      'Plate Version:       ' + (Number(d.plateVersion) || 0),
-      'Latest Plate Record: ' + (d.plate || '-') + ' (' + (Number(d.plateRecords) || 0) + ')',
-      'VIN:                 ' + (d.vin || '-'),
-      'Phone Number:        ' + (d.phone || '-'),
-      'Total Charges:       ' + (t.charges || 0),
-      'Total Citations:     ' + (t.citations || 0),
-      'Total Imprisonments: ' + (t.imprisonments || 0),
-    ].join('\n');
+      ['Owner', d.owner || '-'],
+      ['Vehicle', vehicleLabel(d.model)],
+      ['Plate', d.plate || '-'],
+      ['Plate record', (d.plate || '-') + ' (' + (Number(d.plateRecords) || 0) + ')'],
+      ['VIN', d.vin || '-'],
+      ['Phone', d.phone || '-'],
+      ['Charges', String(t.charges || 0)],
+      ['Citations', String(t.citations || 0)],
+      ['Imprisonments', String(t.imprisonments || 0)],
+    ];
   }
 
+  // BOLO line, built from the template in config.lua so a server can change the
+  // wording without touching this file. Tokens: {time} {date} {detail} {model}
+  // {plate} {owner} {vin} {phone} {charges} {extra}
   function vehicleBoloText() {
     if (!vehCurrent) return '';
     const d = vehCurrent;
-    return `BOLO - ${vehicleLabel(d.model)}, plate ${d.plate || 'UNKNOWN'}. ` +
-           `Registered owner ${d.owner || 'unknown'}. ` +
-           `${(d.outstanding || []).length} outstanding charge(s) on record. ` +
-           `Approach with caution and advise dispatch.`;
+    const cfg = boloTextCfg;
+    const now = new Date();
+    const p2 = (n) => String(n).padStart(2, '0');
+    const MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+    const tokens = {
+      time:    `${p2(now.getHours())}:${p2(now.getMinutes())} ${now.getHours() < 12 ? 'AM' : 'PM'}`,
+      date:    `${p2(now.getDate())}/${MON[now.getMonth()]}`,
+      detail:  cfg.detail,
+      model:   vehicleLabel(d.model),
+      plate:   d.plate || 'UNKNOWN',
+      owner:   d.owner || 'UNKNOWN',
+      vin:     d.vin || 'UNKNOWN',
+      phone:   d.phone || 'UNKNOWN',
+      charges: String((d.outstanding || []).length),
+      extra:   cfg.extra,
+    };
+
+    return String(cfg.template).replace(/\{(\w+)\}/g, (m, k) =>
+      Object.prototype.hasOwnProperty.call(tokens, k) ? tokens[k] : m);
   }
 
   // ------------------------------------------------------------------
@@ -1445,6 +1466,7 @@
   // ------------------------------------------------------------------
   let wsCurrent = null;
   let vehCurrent = null;
+  let boloTextCfg = { template: '{time} {date} | {detail} {model} | LP: {plate} | RO: {owner} | {extra}', detail: 'DETAIL_HERE', extra: 'EXTRA_INFO' };
 
   async function searchWeaponSerial() {
     const serial = $('#ws-serial').value.trim();
@@ -1601,7 +1623,8 @@
     });
     $('#veh-print').addEventListener('click', () => {
       if (!vehCurrent) { toast('Run a plate first.', 'warn'); return; }
-      copyText(vehicleInfoText(), 'Registration');
+      nui('printPlate', { title: 'VEHICLE REGISTRATION', rows: vehicleInfoLines() });
+      toast('Printed to chat.', 'ok');
     });
     $('#veh-bolo').addEventListener('click', () => {
       if (!vehCurrent) { toast('Run a plate first.', 'warn'); return; }

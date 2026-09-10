@@ -252,26 +252,29 @@
               </div>
 
               <div id="veh-results" class="results hidden">
-                <div class="card">
-                  <table class="rec-table kv-table">
-                    <tbody>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-user"/></svg>Owner</td><td id="veh-owner">-</td></tr>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-car"/></svg>Vehicle</td><td id="veh-model">-</td></tr>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-id-card"/></svg>License Plate</td><td id="veh-plate" class="mono">-</td></tr>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-id-card"/></svg>Plate Version</td><td id="veh-plate-ver" class="mono tnum">0</td></tr>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-scroll-text"/></svg>Latest Plate Record</td><td id="veh-plate-rec" class="mono">-</td></tr>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-scan-barcode"/></svg>VIN</td><td id="veh-vin" class="mono">-</td></tr>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-phone"/></svg>Phone Number</td><td id="veh-phone" class="mono">-</td></tr>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-triangle-alert"/></svg>Total Charges</td><td id="veh-tot-charges" class="tnum">0</td></tr>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-receipt"/></svg>Total Citations</td><td id="veh-tot-citations" class="tnum">0</td></tr>
-                      <tr><td class="kv-k"><svg class="ic fld-ic" width="13" height="13"><use href="#i-lock"/></svg>Total Imprisonments</td><td id="veh-tot-imprisonments" class="tnum">0</td></tr>
-                    </tbody>
-                  </table>
-                  <div class="ws-actions">
-                    <button id="veh-print" class="btn">Print Info</button>
-                    <button id="veh-to-calc" class="btn-primary small leo-only">Arrest Calculator</button>
-                    <button id="veh-bolo" class="btn">Copy BOLO Text</button>
+                <div class="card record-card">
+                  <div class="card-head">
+                    <h3>Vehicle Registration</h3>
+                    <div class="head-actions">
+                      <button id="veh-print" class="btn-ghost small">Print Info</button>
+                      <button id="veh-bolo" class="btn-ghost small">Copy BOLO Text</button>
+                      <button id="veh-to-calc" class="btn-primary small leo-only">Arrest Calculator</button>
+                    </div>
                   </div>
+                  <div class="record-grid cols-3">
+                      <div class="field"><label><svg class="ic fld-ic" width="13" height="13" aria-hidden="true"><use href="#i-user"/></svg>Owner</label><span id="veh-owner">-</span></div>
+                      <div class="field"><label><svg class="ic fld-ic" width="13" height="13" aria-hidden="true"><use href="#i-car"/></svg>Vehicle</label><span id="veh-model">-</span></div>
+                      <div class="field"><label><svg class="ic fld-ic" width="13" height="13" aria-hidden="true"><use href="#i-id-card"/></svg>Plate</label><span id="veh-plate" class="mono">-</span></div>
+                      <div class="field"><label><svg class="ic fld-ic" width="13" height="13" aria-hidden="true"><use href="#i-scan-barcode"/></svg>VIN</label><span id="veh-vin" class="mono">-</span></div>
+                      <div class="field"><label><svg class="ic fld-ic" width="13" height="13" aria-hidden="true"><use href="#i-phone"/></svg>Phone</label><span id="veh-phone" class="mono">-</span></div>
+                      <div class="field"><label><svg class="ic fld-ic" width="13" height="13" aria-hidden="true"><use href="#i-scroll-text"/></svg>Plate Record</label><span id="veh-plate-rec" class="mono">-</span></div>
+                  </div>
+                </div>
+
+                <div class="totals-row">
+                  <div class="stat-card"><span class="stat-num tnum" id="veh-tot-charges">0</span><span class="stat-label"><svg class="ic stat-ic" width="12" height="12" aria-hidden="true"><use href="#i-scale"/></svg>Charges</span></div>
+                  <div class="stat-card"><span class="stat-num tnum" id="veh-tot-citations">0</span><span class="stat-label"><svg class="ic stat-ic" width="12" height="12" aria-hidden="true"><use href="#i-receipt"/></svg>Citations</span></div>
+                  <div class="stat-card"><span class="stat-num tnum" id="veh-tot-imprisonments">0</span><span class="stat-label"><svg class="ic stat-ic" width="12" height="12" aria-hidden="true"><use href="#i-lock"/></svg>Imprisonments</span></div>
                 </div>
 
                 <!-- Owner's record. Outstanding is a toggle like the class filters

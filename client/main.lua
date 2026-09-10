@@ -105,6 +105,7 @@ local function openMdc()
             default = Config.Bolo.defaultExpiryHours,
         },
         sections = Config.Sections,
+        boloText = Config.BoloText,
     })
 end
 
@@ -133,6 +134,7 @@ AddEventHandler('mdc:runPlate', function(plate)
             default = Config.Bolo.defaultExpiryHours,
         },
         sections = Config.Sections,
+        boloText = Config.BoloText,
     })
 end)
 
@@ -180,6 +182,37 @@ end
 ----------------------------------------------------------------------
 
 -- closeMdc {} - release focus, restore cam, ack the UI.
+-- Print Info: put the record in CHAT so the channel sees it, rather than
+-- leaving it on one officer's clipboard. Uses the plain chat message shape so
+-- it works with the stock chat resource; point it at your own template by
+-- setting Config.Notify.mode = 'chat'.
+RegisterNUICallback('printPlate', function(data, cb)
+    cb('ok')
+    if type(data) ~= 'table' or type(data.rows) ~= 'table' then return end
+
+    local parts = {}
+    for _, row in ipairs(data.rows) do
+        if type(row) == 'table' and row[1] and row[2] then
+            parts[#parts + 1] = ('%s: %s'):format(tostring(row[1]), tostring(row[2]))
+        end
+    end
+    if #parts == 0 then return end
+
+    local body = table.concat(parts, '  |  ')
+
+    if Config.Notify.mode == 'chat' then
+        TriggerEvent('chat:addMessage', {
+            templateId = Config.Notify.template,
+            args = { data.title or 'MDC', body, 'info' },
+        })
+    else
+        TriggerEvent('chat:addMessage', {
+            multiline = true,
+            args = { data.title or 'MDC', body },
+        })
+    end
+end)
+
 RegisterNUICallback('closeMdc', function(_, cb)
     closeMdc()
     cb('ok')
