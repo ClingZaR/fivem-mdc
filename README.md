@@ -8,6 +8,8 @@ Ships targeting **Qbox** (`qbx_core`), but every framework and database call
 lives behind two adapter files, so porting is a contained job rather than a
 rewrite. See [Porting](#porting-to-another-framework).
 
+![Person Search](docs/person-record.png)
+
 ## Scope
 
 This is the **interface and the record layer**. It deliberately does not ship a
@@ -43,6 +45,65 @@ Roles are enforced **server side on every callback**, not just hidden in the UI:
 
 - `leo`: on-duty police (`job.type == 'leo'`)
 - `court`: judge / lawyer, read-only, no operational sections
+
+## Screenshots
+
+### Records
+
+A citizen record leads with the mugshot, identity and lifetime totals.
+Outstanding charges are always visible; prior record sits behind a toggle, so
+the default view answers "what are they wanted for right now".
+
+| Search | Record history expanded |
+| --- | --- |
+| ![Person search](docs/person-search.png) | ![Record history](docs/person-history.png) |
+
+### Citizen ID
+
+The driver licence card, with licences on file underneath. The portrait is the
+one taken at the DMV, never the arrest mugshot.
+
+![Citizen ID](docs/citizen-id.png)
+
+### Weapons
+
+Registered firearms by owner, and lookup by serial with missing / stolen flags
+and a jump straight into the arrest calculator.
+
+| Registered weapons | Serial lookup |
+| --- | --- |
+| ![Weapon list](docs/weapon-list.png) | ![Weapon serial](docs/weapon-serial.png) |
+
+### Arrest calculator
+
+The penal code with per-charge modifiers, a live jail and fine total, and
+**multiple suspects per incident**: the same charge set is applied to everyone
+involved, resolved server side before anything is written.
+
+| Penal code | Charges and targets |
+| --- | --- |
+| ![Penal code](docs/penal-code.png) | ![Arrest calculator](docs/arrest-calculator.png) |
+
+### BOLOs
+
+Alerts carry multiple images with an inline carousel and a fullscreen viewer.
+Each one has a configurable expiry, shown as a live countdown that turns red in
+its final hour.
+
+![BOLOs](docs/bolos.png)
+
+| Create | Fullscreen viewer |
+| --- | --- |
+| ![Create a BOLO](docs/bolo-create.png) | ![Image viewer](docs/bolo-lightbox.png) |
+
+### Warrants and units
+
+Warrants are derived from outstanding charges rather than tracked separately, so
+they can never disagree with a citizen's record.
+
+| Warrants | Active units |
+| --- | --- |
+| ![Warrants](docs/warrants.png) | ![Active units](docs/units.png) |
 
 ## Images
 
