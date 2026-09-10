@@ -1,14 +1,26 @@
-# Mobile Data Computer (MDC)
+<div align="center">
 
-A police records terminal for FiveM. Person, plate, citizen and weapon lookups,
-a penal code with an arrest calculator, BOLOs, warrants, and a mugshot / DMV
-photo pipeline, in one NUI.
+<img src="html/logo.png" width="96" alt="" />
+
+# Mobile Data Computer
+
+**A police records terminal for FiveM**
+
+[![Framework](https://img.shields.io/badge/framework-Qbox-d97706?style=for-the-badge&labelColor=1a1a1e)](https://github.com/Qbox-project)
+[![Interface](https://img.shields.io/badge/interface-NUI-f59e0b?style=for-the-badge&labelColor=1a1a1e)](#)
+[![Portable](https://img.shields.io/badge/portable-2%20adapter%20files-b45309?style=for-the-badge&labelColor=1a1a1e)](#porting-to-another-framework)
+[![Licence](https://img.shields.io/badge/licence-MIT-d97706?style=for-the-badge&labelColor=1a1a1e)](LICENSE)
+
+Person, plate, citizen and weapon lookups, a penal code with an arrest
+calculator, BOLOs, warrants, and a mugshot / DMV photo pipeline, in one NUI.
+
+<img src="docs/person-record.png" alt="Person Search" width="880" />
+
+</div>
 
 Ships targeting **Qbox** (`qbx_core`), but every framework and database call
 lives behind two adapter files, so porting is a contained job rather than a
 rewrite. See [Porting](#porting-to-another-framework).
-
-![Person Search](docs/person-record.png)
 
 ## Scope
 
@@ -54,9 +66,23 @@ A citizen record leads with the mugshot, identity and lifetime totals.
 Outstanding charges are always visible; prior record sits behind a toggle, so
 the default view answers "what are they wanted for right now".
 
-| Search | Record history expanded |
+| Two outstanding charges | History revealed, showing a dismissal |
 | --- | --- |
-| ![Person search](docs/person-search.png) | ![Record history](docs/person-history.png) |
+| ![Person record](docs/person-record.png) | ![Record history](docs/person-history.png) |
+
+An empty search and a clean record read the same way, so a citizen with nothing
+on file is unmistakable:
+
+![Person search](docs/person-search.png)
+
+### Plate search
+
+Running a plate answers *who am I about to stop*, not just *what is this car*.
+The registration sits above the registered owner's full record, so outstanding
+charges are on screen without scrolling. The `Dismiss` button and the
+`Dismissed by David_Loan` row show the dismissal flow end to end.
+
+![Plate search](docs/plate-search.png)
 
 ### Citizen ID
 
@@ -67,12 +93,10 @@ one taken at the DMV, never the arrest mugshot.
 
 ### Weapons
 
-Registered firearms by owner, and lookup by serial with missing / stolen flags
-and a jump straight into the arrest calculator.
+Registered firearms by owner, with a status per serial. `Toggle Missing` flips a
+weapon in and out of missing from the serial lookup.
 
-| Registered weapons | Serial lookup |
-| --- | --- |
-| ![Weapon list](docs/weapon-list.png) | ![Weapon serial](docs/weapon-serial.png) |
+![Registered weapons](docs/weapon-list.png)
 
 ### Arrest calculator
 
@@ -80,9 +104,7 @@ The penal code with per-charge modifiers, a live jail and fine total, and
 **multiple suspects per incident**: the same charge set is applied to everyone
 involved, resolved server side before anything is written.
 
-| Penal code | Charges and targets |
-| --- | --- |
-| ![Penal code](docs/penal-code.png) | ![Arrest calculator](docs/arrest-calculator.png) |
+![Arrest calculator](docs/arrest-calculator.png)
 
 ### BOLOs
 
@@ -90,16 +112,15 @@ Alerts carry multiple images with an inline carousel and a fullscreen viewer.
 Each one has a configurable expiry, shown as a live countdown that turns red in
 its final hour.
 
-![BOLOs](docs/bolos.png)
-
-| Create | Fullscreen viewer |
+| Create and browse | Fullscreen viewer |
 | --- | --- |
-| ![Create a BOLO](docs/bolo-create.png) | ![Image viewer](docs/bolo-lightbox.png) |
+| ![BOLOs](docs/bolos.png) | ![Image viewer](docs/bolo-lightbox.png) |
 
 ### Warrants and units
 
 Warrants are derived from outstanding charges rather than tracked separately, so
-they can never disagree with a citizen's record.
+they can never disagree with a citizen's record. Active Units groups officers
+under their callsign.
 
 | Warrants | Active units |
 | --- | --- |
