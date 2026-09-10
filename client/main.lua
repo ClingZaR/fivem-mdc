@@ -161,7 +161,7 @@ end
 local RELAY_CALLBACKS = {
     'getDashboard',
     'searchVehicle', 'searchPerson',
-    'getPenalCode', 'placeCharges',
+    'getPenalCode', 'placeCharges', 'dismissCharge',
     'getBolos', 'createBolo', 'cancelBolo',
     'getWarrants',
     'getReports', 'getReport', 'createReport',

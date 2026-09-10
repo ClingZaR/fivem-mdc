@@ -35,6 +35,7 @@
     cart: [],                 // [{code,title,class,months,fine,blockedModifiers,mods:[id]}]
     targets: [],              // [name] - one incident can cover several suspects (NO cids)
     personName: null,         // last person searched, offered to the calculator
+    canDismiss: false,        // supervisor / justice: may dismiss a charge
     role: 'leo',              // 'leo' | 'court' (read-only)
     loadingPenal: false,
     loaded: { dashboard: false, bolos: false, warrants: false, weapons: false },
@@ -386,6 +387,7 @@
     empty.classList.add('hidden');
     results.classList.remove('hidden');
     vehCurrent = data;
+    state.canDismiss = !!data.canDismiss;
 
     const records = Number(data.plateRecords) || 0;
     $('#veh-owner').textContent = data.owner || '-';
@@ -422,16 +424,37 @@
     const shown = rows.filter((r) => VEH_FILTER[r.class] !== false);
     $('#veh-rec-count').textContent = String(shown.length);
 
-    body.innerHTML = shown.length
-      ? shown.map((r) => {
-          const plea = r.outstanding ? 'Pending' : pleaLabel(r.plea);
-          return `<tr${r.outstanding ? ' class="row-outstanding"' : ''}>` +
-                 `<td class="mono">${escapeHtml(r.date || '-')}</td>` +
-                 `<td><span class="badge ${escapeHtml(r.class || '')}">${escapeHtml(r.code || '')}</span> ${escapeHtml(r.title || '')}</td>` +
-                 `<td>${escapeHtml(r.officer || '-')}</td>` +
-                 `<td>${escapeHtml(plea)}</td></tr>`;
-        }).join('')
-      : `<tr class="empty-row"><td colspan="4">No charges on record</td></tr>`;
+    if (!shown.length) {
+      body.innerHTML = `<tr class="empty-row"><td colspan="5">No charges on record</td></tr>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    shown.forEach((r) => {
+      let plea;
+      if (r.outstanding)     plea = 'Pending';
+      else if (r.dismissed)  plea = 'Dismissed by ' + (r.dismissedBy || 'unknown');
+      else                   plea = pleaLabel(r.plea);
+
+      const tr = document.createElement('tr');
+      if (r.outstanding) tr.className = 'row-outstanding';
+      tr.innerHTML =
+        `<td class="mono">${escapeHtml(r.date || '-')}</td>` +
+        `<td><span class="badge ${escapeHtml(r.class || '')}">${escapeHtml(r.code || '')}</span> ${escapeHtml(r.title || '')}</td>` +
+        `<td>${escapeHtml(r.officer || '-')}</td>` +
+        `<td>${escapeHtml(plea)}</td>` +
+        `<td class="act-col">` +
+          (r.outstanding && state.canDismiss && r.id
+            ? `<button class="btn-ghost small danger dismiss-btn" title="Dismiss this charge">Dismiss</button>`
+            : '') +
+        `</td>`;
+
+      const btn = tr.querySelector('.dismiss-btn');
+      if (btn) btn.addEventListener('click', () => dismissCharge(r, btn));
+      frag.appendChild(tr);
+    });
+    body.innerHTML = '';
+    body.appendChild(frag);
   }
 
   function pleaLabel(p) {
@@ -578,6 +601,7 @@
     renderHistory(Array.isArray(data.history) ? data.history : []);
 
     // carry the NAME as the arrest target (NO cid anywhere)
+    state.canDismiss = !!data.canDismiss;
     setHistoryVisible(false);   // every new record starts collapsed
 
     state.personName = data.name;   // offered to the calculator by the button below
@@ -600,7 +624,7 @@
     const body = $('#per-outstanding-body');
     $('#per-out-count').textContent = String(rows.length);
     if (!rows.length) {
-      body.innerHTML = `<tr class="empty-row"><td colspan="6">No outstanding charges.</td></tr>`;
+      body.innerHTML = `<tr class="empty-row"><td colspan="7">No outstanding charges.</td></tr>`;
       return;
     }
     const frag = document.createDocumentFragment();
@@ -614,11 +638,67 @@
         `<td><span class="badge ${cm.key}">${escapeHtml(cm.label)}</span></td>` +
         `<td class="num mono">${Number(r.months) || 0}</td>` +
         `<td class="num mono">${money(r.fine)}</td>` +
-        `<td class="mods-cell">${mods ? escapeHtml(mods) : '-'}</td>`;
+        `<td class="mods-cell">${mods ? escapeHtml(mods) : '-'}</td>` +
+        `<td class="act-col">` +
+          (state.canDismiss && r.id
+            ? `<button class="btn-ghost small danger dismiss-btn" title="Dismiss this charge">Dismiss</button>`
+            : '') +
+        `</td>`;
+
+      const btn = tr.querySelector('.dismiss-btn');
+      if (btn) btn.addEventListener('click', () => dismissCharge(r, btn));
       frag.appendChild(tr);
     });
     body.innerHTML = '';
     body.appendChild(frag);
+  }
+
+  // Dismissing clears the charge from outstanding but keeps it on the record,
+  // stamped with who did it. It cannot be undone from the UI, so the button
+  // arms itself first: one click to arm, a second within four seconds to
+  // commit. An inline confirm rather than window.confirm, which CEF handles
+  // badly and which blocks the render thread.
+  async function dismissCharge(charge, btn) {
+    if (btn.dataset.armed !== '1') {
+      btn.dataset.armed = '1';
+      btn.classList.add('armed');
+      btn.textContent = 'Confirm?';
+      btn.title = 'Click again to dismiss. Reverts in a few seconds.';
+      clearTimeout(btn._disarm);
+      btn._disarm = setTimeout(() => {
+        btn.dataset.armed = '0';
+        btn.classList.remove('armed');
+        btn.textContent = 'Dismiss';
+        btn.title = 'Dismiss this charge';
+      }, 4000);
+      return;
+    }
+
+    clearTimeout(btn._disarm);
+    btn.disabled = true;
+    btn.textContent = 'Dismissing...';
+    const res = await nui('dismissCharge', { id: charge.id });
+
+    if (res && res.success) {
+      toast(res.message || 'Charge dismissed.', 'ok');
+      refreshCurrentRecord();
+    } else {
+      btn.disabled = false;
+      btn.dataset.armed = '0';
+      btn.classList.remove('armed');
+      btn.textContent = 'Dismiss';
+      toast((res && res.message) || 'Could not dismiss that charge.', 'err');
+    }
+  }
+
+  // Re-run whichever lookup is on screen so the row moves from outstanding
+  // into history without the user searching again.
+  function refreshCurrentRecord() {
+    const active = $('.tab-panel.active');
+    const tab = active && active.dataset.tab;
+    if (tab === 'vehicle' && vehCurrent) searchVehicle();
+    else if (state.personName) searchPerson();
+    state.loaded.warrants = false;   // a dismissal can clear a warrant
   }
 
   // Record History (rap sheet): PAST processed charges/citations, most-recent
@@ -658,7 +738,10 @@
       // plea: 'na' on citations (no plea applies) -> muted N/A; otherwise the plea-badge.
       const plea = String(r.plea || 'pending').toLowerCase();
       let pleaCell;
-      if (plea === 'na') {
+      if (r.dismissed) {
+        pleaCell = `<span class="plea-badge dismissed" title="Dismissed by ${escapeHtml(r.dismissedBy || 'unknown')}">` +
+                   `DISMISSED by ${escapeHtml(r.dismissedBy || 'UNKNOWN')}</span>`;
+      } else if (plea === 'na') {
         pleaCell = `<span class="dim">N/A</span>`;
       } else {
         const pleaMeta = ({

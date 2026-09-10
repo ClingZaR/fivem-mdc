@@ -59,6 +59,17 @@ Config.Dmv = {
     allowLeo = true,    -- on-duty police may also take one (small servers)
 }
 
+-- Dismissing an outstanding charge.
+--
+-- A dismissal does NOT delete anything. The charge stops being outstanding (so
+-- it clears the warrant and stops counting against the suspect) but stays on
+-- the record permanently, showing who dismissed it. Accountability is the point.
+Config.ChargeDismissal = {
+    minLeoGrade = 3,               -- supervisors and above
+    allowBoss   = true,            -- any job grade flagged isboss
+    justiceJobs = { 'judge' },     -- add 'lawyer' if your server wants it
+}
+
 -- BOLOs. An expired BOLO stops showing to officers but is kept in the table,
 -- so the record of what was put out and when survives.
 Config.Bolo = {

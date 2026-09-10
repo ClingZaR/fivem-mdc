@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS mdc_charges (
   modifiers VARCHAR(128),
   officer VARCHAR(128),
   plea VARCHAR(16) DEFAULT 'Guilty',
+  dismissed_by VARCHAR(128) DEFAULT '',
+  dismissed_at DATETIME DEFAULT NULL,
   status VARCHAR(16) DEFAULT 'outstanding',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
@@ -198,11 +200,11 @@ SELECT COUNT(*) AS imprisonments FROM mdc_imprisonments WHERE citizenid = ?
 -- Processed charge history (rap sheet): each past charge/citation + its case plea.
 local HISTORY_FOR_PERSON_SQL = [[
 SELECT c.code, c.title, c.class, c.months, c.fine, i.plea AS plea,
-       c.officer AS officer,
+       c.officer AS officer, c.status AS status, c.dismissed_by AS dismissed_by,
        DATE_FORMAT(c.created_at,'%Y-%m-%d') AS date
 FROM mdc_charges c
 LEFT JOIN mdc_imprisonments i ON i.id = c.case_id
-WHERE c.citizenid = ? AND c.status = 'processed'
+WHERE c.citizenid = ? AND c.status IN ('processed', 'dismissed')
 ORDER BY c.created_at DESC
 LIMIT 60
 ]]
@@ -214,7 +216,7 @@ VALUES (?, ?, ?, ?, ?)
 
 -- Outstanding charges for a person (Person tab outstanding list).
 local OUTSTANDING_FOR_PERSON_SQL = [[
-SELECT code, title, class, months, fine, modifiers, officer,
+SELECT id, code, title, class, months, fine, modifiers, officer,
        DATE_FORMAT(created_at,'%Y-%m-%d') AS date
 FROM mdc_charges
 WHERE citizenid = ? AND status = 'outstanding'
@@ -369,6 +371,33 @@ local function getMdcUser(source)
 end
 
 
+-- May this player dismiss an outstanding charge?
+--
+-- Two routes: a senior officer (job grade at or above the configured level, or
+-- any grade flagged isboss), or the justice system (judge, and lawyer if the
+-- server adds it). Everyone else can see the button's absence, and the server
+-- refuses the callback regardless of what the UI shows.
+local function canDismissCharge(source)
+    local player = Bridge.GetPlayer(source)
+    if not player or not player.PlayerData then return false end
+
+    local job = player.PlayerData.job or {}
+    local cfg = Config.ChargeDismissal
+
+    for _, name in ipairs(cfg.justiceJobs or {}) do
+        if job.name == name then return true end
+    end
+
+    -- Police supervisors must be ON DUTY: this is an on-the-job power.
+    if job.type == 'leo' and job.onduty then
+        if cfg.allowBoss and job.isboss then return true end
+        local level = (job.grade and tonumber(job.grade.level)) or 0
+        if level >= (cfg.minLeoGrade or 99) then return true end
+    end
+
+    return false
+end
+
 -- Build a "First Last" display name from a charinfo table.
 local function fullName(ci)
     ci = ci or {}
@@ -477,6 +506,7 @@ local function handleSearchVehicle(source, data)
 
     return {
         found = true,
+        canDismiss = canDismissCharge(source),
         owner = row.owner,
         model = row.model,
         plate = row.plate,
@@ -558,13 +588,17 @@ function citizenRecord(cid)
     local history = {}
     for _, h in ipairs(MySQL.query.await(HISTORY_FOR_PERSON_SQL, { cid }) or {}) do
         local months = tonumber(h.months) or 0
+        local dismissed = h.status == 'dismissed'
         history[#history + 1] = {
             code = h.code, title = h.title, class = h.class,
             months = months, fine = tonumber(h.fine) or 0,
             date = h.date or h.created_at,
             officer = h.officer,
-            outcome = months > 0 and 'served' or 'paid',
-            plea = (h.class == 'citation') and 'na' or (h.plea or 'na'),
+            dismissed = dismissed,
+            dismissedBy = dismissed and (h.dismissed_by or 'Unknown') or nil,
+            outcome = dismissed and 'dismissed' or (months > 0 and 'served' or 'paid'),
+            plea = dismissed and 'dismissed'
+                   or ((h.class == 'citation') and 'na' or (h.plea or 'na')),
         }
     end
 
@@ -597,6 +631,7 @@ local function handleSearchPerson(source, data)
 
     return {
         found = true,
+        canDismiss = canDismissCharge(source),
         name = row.name,
         mugshot = mugshot,
         phone = row.phone,
@@ -604,6 +639,42 @@ local function handleSearchPerson(source, data)
         outstanding = outstanding,
         history = history,
         prints = hasPrints,
+    }
+end
+
+-- dismissCharge {id} -> { success, message }
+-- Clears an outstanding charge WITHOUT deleting it: status becomes 'dismissed'
+-- and the record keeps it, stamped with who dismissed it. Supervisors and the
+-- justice system only.
+local function handleDismissCharge(source, data)
+    if not canDismissCharge(source) then
+        return { success = false, message = 'Supervisors and the justice system only.' }
+    end
+
+    local id = tonumber(data and data.id)
+    if not id then return { success = false, message = 'No charge selected.' } end
+
+    local row = MySQL.single.await(
+        'SELECT id, title, status FROM mdc_charges WHERE id = ? LIMIT 1', { id })
+    if not row then return { success = false, message = 'Charge not found.' } end
+    if row.status ~= 'outstanding' then
+        return { success = false, message = 'That charge is no longer outstanding.' }
+    end
+
+    -- Recorded as Firstname_Lastname so the record reads as a person, not a job title.
+    local player = Bridge.GetPlayer(source)
+    local who = fullName(player.PlayerData.charinfo):gsub('%s+', '_')
+
+    MySQL.update.await([[
+        UPDATE mdc_charges
+        SET status = 'dismissed', dismissed_by = ?, dismissed_at = NOW()
+        WHERE id = ? AND status = 'outstanding'
+    ]], { who, id })
+
+    return {
+        success = true,
+        message = ('Dismissed "%s".'):format(row.title or 'charge'),
+        dismissedBy = who,
     }
 end
 
@@ -1164,6 +1235,7 @@ local handlers = {
     searchVehicle = handleSearchVehicle,
     searchPerson  = handleSearchPerson,
     getPenalCode  = handleGetPenalCode,
+    dismissCharge = handleDismissCharge,
     placeCharges  = handlePlaceCharges,
     getBolos      = handleGetBolos,
     createBolo    = handleCreateBolo,
@@ -1392,6 +1464,9 @@ CreateThread(function()
     -- Links a processed charge to the imprisonment (case) it was part of, so the
     -- rap sheet can show the plea per charge.
     ensureColumn('mdc_charges', 'case_id', 'INT DEFAULT 0')
+    -- Dismissals: the charge stays on the record, flagged with who cleared it.
+    ensureColumn('mdc_charges', 'dismissed_by', "VARCHAR(128) DEFAULT ''")
+    ensureColumn('mdc_charges', 'dismissed_at', 'DATETIME DEFAULT NULL')
     ensureColumn('mdc_bolos', 'image_url', "VARCHAR(512) DEFAULT ''")
     ensureColumn('mdc_bolos', 'image_urls', 'TEXT')
     ensureColumn('mdc_bolos', 'expires_at', 'DATETIME DEFAULT NULL')

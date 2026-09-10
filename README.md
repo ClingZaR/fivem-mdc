@@ -105,6 +105,29 @@ they can never disagree with a citizen's record.
 | --- | --- |
 | ![Warrants](docs/warrants.png) | ![Active units](docs/units.png) |
 
+## Dismissing a charge
+
+Supervisors and the justice system can clear an outstanding charge from a
+citizen's record without deleting it. The charge stops being outstanding, so it
+no longer counts against the suspect and no longer raises a warrant, but it
+stays on the record permanently stamped with who dismissed it, as
+`Firstname_Lastname`.
+
+```lua
+Config.ChargeDismissal = {
+    minLeoGrade = 3,             -- supervisors and above
+    allowBoss   = true,          -- any job grade flagged isboss
+    justiceJobs = { 'judge' },   -- add 'lawyer' if your server wants it
+}
+```
+
+The button only renders for someone who qualifies, and **the server re-checks on
+the callback**, so hiding it is not the control. Police supervisors must also be
+on duty; the justice system is not duty-gated.
+
+Dismissal is not reversible from the interface, so the button arms on first
+click and commits on a second within a few seconds.
+
 ## Images
 
 Mugshots and DMV portraits are the same capture pipeline with two destinations,

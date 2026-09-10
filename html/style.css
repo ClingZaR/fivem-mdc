@@ -1004,3 +1004,22 @@ input, textarea, select{ user-select:text; -webkit-user-select:text; }
 /* The outstanding toggle sits with the class chips but reads as its own thing. */
 .filter-chip.outstanding{ border-color:var(--accent); color:var(--accent-hi); }
 .filter-chip.outstanding.off{ border-color:var(--btn-border); color:var(--text-muted); }
+
+/* ============================================================
+   CHARGE DISMISSAL
+   A dismissal is destructive-looking but not destructive: the charge
+   leaves outstanding and stays on the record naming who cleared it.
+   ============================================================ */
+.rec-table th.act-col, .rec-table td.act-col{
+  width:1%; white-space:nowrap; text-align:right; padding-left:8px;
+}
+.rec-table td.act-col .btn-ghost{ height:26px; padding:0 10px; font-size:11px; }
+
+.plea-badge.dismissed{
+  color:var(--text-muted); background:rgba(255,255,255,.05);
+  border:1px solid var(--btn-border);
+  font-size:10px; letter-spacing:.4px;
+}
+.rec-table td.act-col .btn-ghost.armed{
+  background:var(--danger); border-color:var(--danger); color:#fff; font-weight:700;
+}
